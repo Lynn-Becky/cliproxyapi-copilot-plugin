@@ -3,7 +3,7 @@
 This guide adds the GitHub Copilot plugin to an existing official CLIProxyAPI
 deployment without replacing its configuration, API keys, or existing
 providers. The plugin currently targets CLIProxyAPI `v7.2.118`, ABI version 1,
-on Linux `amd64`.
+on Linux `amd64` and Linux `arm64`.
 
 ## 1. Build the plugin
 
@@ -19,13 +19,19 @@ The resulting library is:
 build/plugins/linux/amd64/cliproxyapi-copilot.so
 ```
 
+For Linux `arm64`, use:
+
+```text
+build/plugins/linux/arm64/cliproxyapi-copilot.so
+```
+
 The filename is significant: CLIProxyAPI derives the plugin ID
 `cliproxyapi-copilot` from it. Do not rename the library unless the matching key
 under `plugins.configs` is also renamed.
 
 ## 2. Install the library
 
-CLIProxyAPI searches both `<plugins.dir>/linux/amd64` and `<plugins.dir>`.
+CLIProxyAPI searches both `<plugins.dir>/linux/<arch>` and `<plugins.dir>`.
 Using the platform-specific directory avoids loading an incompatible binary.
 
 ### Native CLIProxyAPI
@@ -38,6 +44,8 @@ sudo install -m 0755 \
   build/plugins/linux/amd64/cliproxyapi-copilot.so \
   /opt/cliproxyapi/plugins/linux/amd64/cliproxyapi-copilot.so
 ```
+
+For `arm64`, replace `amd64` in both paths with `arm64`.
 
 The CLIProxyAPI process must be able to read the library. Use a different
 absolute directory if `/opt/cliproxyapi` does not match the deployment.
@@ -52,6 +60,8 @@ install -m 0755 \
   build/plugins/linux/amd64/cliproxyapi-copilot.so \
   /path/to/cliproxyapi/plugins/linux/amd64/cliproxyapi-copilot.so
 ```
+
+For `arm64`, replace `amd64` in both paths with `arm64`.
 
 Mount that directory into the existing container:
 
