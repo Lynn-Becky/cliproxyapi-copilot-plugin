@@ -91,7 +91,7 @@ make test
 make build
 ```
 
-The loader artifact is:
+The default loader artifact from `make build` is:
 
 ```text
 build/plugins/linux/amd64/cliproxyapi-copilot.so
@@ -99,6 +99,9 @@ build/plugins/linux/amd64/cliproxyapi-copilot.so
 
 `make build-local` exists for development, but a binary built on a newer host
 glibc may not load in the Bookworm container.
+
+`make package` builds and packages both Linux `amd64` and Linux `arm64`
+precompiled archives.
 
 ## Existing CLIProxyAPI deployment
 
@@ -111,8 +114,9 @@ including the complete configuration block, are in
 
 ## CI and releases
 
-Every push and pull request runs the Go tests and builds a production-compatible
-Linux `amd64` marketplace package. Pushes do not publish releases.
+Every push and pull request runs the Go tests and builds production-compatible
+Linux `amd64` and Linux `arm64` marketplace packages. Pushes do not publish
+releases.
 
 To publish a marketplace-compatible release, create and push a dotted numeric
 version tag:
@@ -127,6 +131,7 @@ and publishes:
 
 ```text
 cliproxyapi-copilot_0.3.1_linux_amd64.zip
+cliproxyapi-copilot_0.3.1_linux_arm64.zip
 checksums.txt
 ```
 
