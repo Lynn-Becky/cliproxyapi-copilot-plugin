@@ -29,6 +29,7 @@ jobs:
 
       - name: Run tests
         run: |
+          mkdir -p .cache/go-build .cache/go-mod .cache/home
           docker run --rm \
             --user "$(id -u):$(id -g)" \
             -e HOME=/src/.cache/home \
