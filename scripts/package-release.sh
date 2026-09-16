@@ -3,7 +3,11 @@ set -eu
 
 VERSION=${1:-}
 GOOS=${2:-linux}
-shift 2 || true
+if [ "$#" -ge 2 ]; then
+  shift 2
+elif [ "$#" -ge 1 ]; then
+  shift
+fi
 if [ "$#" -gt 0 ]; then
   ARCHES="$*"
 else

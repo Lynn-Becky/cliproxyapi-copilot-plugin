@@ -92,7 +92,12 @@ Re-run this step whenever `config/config.yaml` changes.
 Build the plugin shared library inside the pinned Go container:
 
 ```bash
-make build
+case "$(uname -m)" in
+  x86_64) ARCH=amd64 ;;
+  aarch64|arm64) ARCH=arm64 ;;
+  *) echo "Unsupported Linux architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+make build ARCH="$ARCH"
 ```
 
 Docker Hub currently publishes this CLIProxyAPI release as `v7.2.118` rather
@@ -327,7 +332,12 @@ Rebuild after updating the repository:
 ```bash
 git pull
 make test
-make build
+case "$(uname -m)" in
+  x86_64) ARCH=amd64 ;;
+  aarch64|arm64) ARCH=arm64 ;;
+  *) echo "Unsupported Linux architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+make build ARCH="$ARCH"
 docker restart cliproxyapi-official-copilot-dev
 ```
 

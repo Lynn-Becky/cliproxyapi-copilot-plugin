@@ -10,16 +10,27 @@ on Linux `amd64` and Linux `arm64`.
 ```bash
 git clone https://github.com/arthur-sommer-etc/cliproxyapi-copilot-plugin.git
 cd cliproxyapi-copilot-plugin
-make build
+case "$(uname -m)" in
+  x86_64) ARCH=amd64 ;;
+  aarch64|arm64) ARCH=arm64 ;;
+  *) echo "Unsupported Linux architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+make build ARCH="$ARCH"
 ```
 
-The resulting library is:
+The resulting library is under the host architecture directory:
 
 ```text
-build/plugins/linux/amd64/cliproxyapi-copilot.so
+build/plugins/linux/$ARCH/cliproxyapi-copilot.so
 ```
 
-For Linux `arm64`, use:
+For Linux `arm64`, the build command is explicitly:
+
+```bash
+make build ARCH=arm64
+```
+
+and the resulting library is:
 
 ```text
 build/plugins/linux/arm64/cliproxyapi-copilot.so

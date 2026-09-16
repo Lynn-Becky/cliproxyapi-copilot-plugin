@@ -97,6 +97,14 @@ The default loader artifact from `make build` is:
 build/plugins/linux/amd64/cliproxyapi-copilot.so
 ```
 
+On an `arm64` Linux host, select the matching target explicitly:
+
+```sh
+make build ARCH=arm64
+```
+
+This produces `build/plugins/linux/arm64/cliproxyapi-copilot.so`.
+
 `make build-local` exists for development, but a binary built on a newer host
 glibc may not load in the Bookworm container.
 

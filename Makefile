@@ -13,7 +13,13 @@ BUILD_PREREQ_arm64 := apt-get update >/dev/null && apt-get install -y --no-insta
 BUILD_ENV_amd64 := GOOS=$(GOOS) GOARCH=amd64
 BUILD_ENV_arm64 := GOOS=$(GOOS) GOARCH=arm64 CC=aarch64-linux-gnu-gcc
 DOCKER_USER_amd64 := --user "$$(id -u):$$(id -g)"
-DOCKER_USER_arm64 :=
+# arm64 installs its cross compiler in the container. The EXIT cleanup below
+# returns bind-mounted output and caches to the invoking host user.
+DOCKER_USER_arm64 := --user 0:0
+DOCKER_ENV_amd64 :=
+DOCKER_ENV_arm64 := -e BUILD_UID="$$(id -u)" -e BUILD_GID="$$(id -g)"
+BUILD_CLEANUP_amd64 :=
+BUILD_CLEANUP_arm64 := cleanup() { chown -R "$$BUILD_UID:$$BUILD_GID" /src/$(PLUGIN_DIR) /src/$(CACHE_DIR); }; trap cleanup 0;
 
 .PHONY: test build build-arm64 build-all build-local package clean
 
@@ -25,13 +31,14 @@ build:
 	docker run --rm \
 		--platform $(BUILD_PLATFORM) \
 		$(DOCKER_USER_$(ARCH)) \
+		$(DOCKER_ENV_$(ARCH)) \
 		-e HOME=/src/$(CACHE_DIR)/home \
 		-e GOCACHE=/src/$(CACHE_DIR)/go-build \
 		-e GOMODCACHE=/src/$(CACHE_DIR)/go-mod \
 		-v "$(CURDIR):/src" \
 		-w /src \
 		$(GO_IMAGE) \
-		sh -ec '$(BUILD_PREREQ_$(ARCH)) CGO_ENABLED=1 $(BUILD_ENV_$(ARCH)) go build -buildvcs=false -trimpath -ldflags "$(VERSION_LDFLAG)" -buildmode=c-shared -o $(PLUGIN_SO) ./cmd/cliproxyapi-copilot'
+		sh -ec '$(BUILD_CLEANUP_$(ARCH)) $(BUILD_PREREQ_$(ARCH)) CGO_ENABLED=1 $(BUILD_ENV_$(ARCH)) go build -buildvcs=false -trimpath -ldflags "$(VERSION_LDFLAG)" -buildmode=c-shared -o $(PLUGIN_SO) ./cmd/cliproxyapi-copilot'
 
 build-arm64:
 	$(MAKE) build ARCH=arm64
